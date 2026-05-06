@@ -61,6 +61,27 @@ module ManageIQ
         )
       end
 
+      def contents(max_count = 1_000)
+        Systemd::Journal.open do |journal|
+          journal.filter(:syslog_identifier => progname)
+          journal.seek(:tail)
+          journal.move(-max_count)
+
+          results = []
+          loop do
+            entry = journal.current_entry
+            # This is the time in microseconds since the epoch UTC, formatted as a decimal string.
+            seconds_since_epoch = entry._source_realtime_timestamp.to_f / 1_000_000.0
+            timestamp = Time.zone.at(seconds_since_epoch).strftime("%Y-%m-%dT%H:%M:%S.%6N")
+
+            results << "[#{timestamp} ##{entry._pid}]#{entry.message}"
+            break unless journal.move_next
+          end
+
+          results
+        end
+      end
+
       private
 
       # Map the Systemd::Journal error levels to the Logger error levels. For
