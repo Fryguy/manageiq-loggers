@@ -39,6 +39,11 @@ describe ManageIQ::Loggers::File do
         expect(result.size).to eq(10)
       end
 
+      it "reads a full line if ending on a buffer_size boundary" do
+        buffer_size = File.size(logger.logdev.filename) - 10
+        expect(logger.contents(10, buffer_size)).to match_array(logger.contents)
+      end
+
       it "returns lines in correct order" do
         result = logger.contents(3)
         expect(result[0]).to include("Line 8")

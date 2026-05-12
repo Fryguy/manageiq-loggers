@@ -1,17 +1,17 @@
 module ManageIQ
   module Loggers
     class File < Base
-      def contents(line_count = 1_000)
+      def contents(line_count = 1_000, buffer_size = 8_192)
         return [] unless logdev&.filename && ::File.exist?(logdev.filename)
 
-        tail(line_count)
+        tail(line_count, buffer_size)
           .select { |line| line&.unpack("U*") rescue nil }
           .map { |line| line.force_encoding("utf-8") }
       end
 
       private
 
-      def tail(line_count)
+      def tail(line_count, buffer_size)
         lines = []
 
         ::File.open(logdev.filename, 'r') do |file|
@@ -22,8 +22,8 @@ module ManageIQ
           # If file is empty, return empty array
           return [] if file_size.zero?
 
-          buffer_size = 8_192
-          position = file_size
+          partial_line = ""
+          position     = file_size
 
           # Read backwards in chunks until we have enough lines
           while position > 0 && lines.size < line_count
@@ -35,16 +35,22 @@ module ManageIQ
             file.seek(position, IO::SEEK_SET)
             chunk = file.read(chunk_size)
 
-            # Split into lines and prepend to our lines array
+            # Split into lines
             chunk_lines = chunk.split("\n")
 
-            # If we're not at the start of the file, the first line might be partial
-            if position > 0 && !lines.empty?
-              lines[0] = chunk_lines.pop + lines[0]
-            end
+            # Handle the last line in chunk (partial line continuing to next chunk)
+            # by appending the saved partial line to the last line of this chunk
+            chunk_lines[-1] = chunk_lines[-1] + partial_line unless partial_line.empty?
 
-            lines = chunk_lines + lines
+            # If we're not at the start of the file, the first line is partial
+            partial_line = position > 0 ? chunk_lines.shift : ""
+
+            # Prepend complete lines to our result
+            lines.prepend(*chunk_lines)
           end
+
+          # Add the remaining partial line at the beginning
+          lines.unshift(partial_line) unless partial_line.empty?
         end
 
         lines.last(line_count)
