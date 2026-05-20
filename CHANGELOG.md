@@ -4,14 +4,18 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [2.0.0] - 2026-05-19
 ### Removed
 - **BREAKING** Remove the deprecated `current_request.request_id` [(#80)](https://github.com/ManageIQ/manageiq-loggers/pull/80)
-
-### Removed
 - **BREAKING** Remove the Cloudwatch Logger [(#81)](https://github.com/ManageIQ/manageiq-loggers/pull/81)
+
+### Added
+- Add `#contents` method to Journald and File loggers [(#126)](https://github.com/ManageIQ/manageiq-loggers/pull/126)
 
 ### Fixed
 - Handle nil caller_object in Journald logger [(#91)](https://github.com/ManageIQ/manageiq-loggers/pull/91)
+- Determine caller location dynamically [(#92)](https://github.com/ManageIQ/manageiq-loggers/pull/92)
 
 ## [1.2.0] - 2024-09-30
 ### Added
@@ -106,7 +110,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.1.0] - 2019-01-08
 
-[Unreleased]: https://github.com/ManageIQ/manageiq-loggers/compare/v1.2.0...master
+[Unreleased]: https://github.com/ManageIQ/manageiq-loggers/compare/v2.0.0...master
+[2.0.0]: https://github.com/ManageIQ/manageiq-loggers/compare/v1.2.0...v2.0.0
 [1.2.0]: https://github.com/ManageIQ/manageiq-loggers/compare/v1.1.1...v1.2.0
 [1.1.1]: https://github.com/ManageIQ/manageiq-loggers/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/ManageIQ/manageiq-loggers/compare/v1.0.1...v1.1.0
