@@ -79,11 +79,13 @@ RSpec.describe ManageIQ::Loggers::Journald, :linux do
       end
       allow(journal).to receive(:current_entry) { current_entry }
 
-      result = logger.contents
+      result = Time.use_zone('Eastern Time (US & Canada)') do
+        logger.contents
+      end
       expected = [
-         "[2024-05-06T08:53:20.000000 #123]  INFO -- manageiq: Line 1\n",
-         "[2024-05-06T08:53:21.000000 #456]  WARN -- manageiq: Line 2\n",
-         "[2024-05-06T08:53:22.000000 #789] ERROR -- manageiq: Line 3\n"
+         "[2024-05-06T12:53:20.000000 #123]  INFO -- manageiq: Line 1\n",
+         "[2024-05-06T12:53:21.000000 #456]  WARN -- manageiq: Line 2\n",
+         "[2024-05-06T12:53:22.000000 #789] ERROR -- manageiq: Line 3\n"
        ]
 
       expect(result).to eq(expected)
